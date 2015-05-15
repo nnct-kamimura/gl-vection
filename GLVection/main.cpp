@@ -18,8 +18,7 @@
 //      CoreVideo, IOKit, Cocoa, OpenGL
 //   and include libglfw.dylib to build phase.
 int main(int argc, const char * argv[]) {
-    // initialize glut
-
+    // initialize GLFW
     if (glfwInit() == GL_FALSE)
     {
         std::cerr << "Can't initialize GLFW" << std::endl;
