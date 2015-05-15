@@ -21,6 +21,7 @@ int main(int argc, const char * argv[]) {
     // initialize GLFW
     if (glfwInit() == GL_FALSE)
     {
+        // Initialization fail
         std::cerr << "Can't initialize GLFW" << std::endl;
         return EXIT_FAILURE;
     }
