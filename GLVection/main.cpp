@@ -8,8 +8,23 @@
 
 #include <iostream>
 
+// glut is now deprecated
+//  thus change it to GLFW
+#include "GLFW/glfw3.h"
+#include <OpenGL/OpenGL.h>
+
+//  To use GLFW: fink, brew or port install glfw.
+//  Folowing frameworks are required.
+//      CoreVideo, IOKit, Cocoa, OpenGL
+//   and include libglfw.dylib to build phase.
 int main(int argc, const char * argv[]) {
-    // insert code here...
-    std::cout << "Hello, World!\n";
-    return 0;
+    // initialize glut
+
+    if (glfwInit() == GL_FALSE)
+    {
+        std::cerr << "Can't initialize GLFW" << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
 }
