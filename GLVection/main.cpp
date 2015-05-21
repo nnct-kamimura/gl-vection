@@ -56,5 +56,20 @@ int main(int argc, const char * argv[]) {
         return EXIT_FAILURE;
     }
     
+    // set the window as openGL target
+    glfwMakeContextCurrent(window);
+    
+    // set clear color
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    
+    // rendering loop
+    while (glfwWindowShouldClose(window) == GL_FALSE && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
+    {
+        glClear(GL_COLOR_BUFFER_BIT);
+        
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+    
     return EXIT_SUCCESS;
 }
