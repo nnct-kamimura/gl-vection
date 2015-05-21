@@ -25,6 +25,17 @@ static void cleanup()
     glfwTerminate();
 }
 
+void display(void){
+  glClear(GL_COLOR_BUFFER_BIT);
+  glColor3d(1.0,0.0,0.0);
+  glBegin(GL_LINES);
+  glVertex2d(-0.8,0.0);
+  glVertex2d(0.8,0.0);
+  glVertex2d(0.0,-0.8);
+  glVertex2d(0.0,0.8);
+  glEnd();
+  glFlush();
+}
 
 int main(int argc, const char * argv[]) {
     // initialize GLFW
@@ -46,8 +57,8 @@ int main(int argc, const char * argv[]) {
     const GLFWvidmode *mode = glfwGetVideoMode(monitors[0]);
     
     // create window
-    GLFWwindow *const window(glfwCreateWindow(mode->width, mode->height, "GL Vection", monitors[0], NULL));
-    //GLFWwindow *const window(glfwCreateWindow(640, 480, "GL Vection", NULL, NULL));
+    //GLFWwindow *const window(glfwCreateWindow(mode->width, mode->height, "GL Vection", monitors[0], NULL));
+    GLFWwindow *const window(glfwCreateWindow(640, 480, "GL Vection", NULL, NULL));
     
     if (window == NULL)
     {
@@ -55,6 +66,21 @@ int main(int argc, const char * argv[]) {
         std::cerr << "Can't create GLFW window." << std::endl;
         return EXIT_FAILURE;
     }
-    
+    // Target window which was created in OpenGL
+    glfwMakeContextCurrent(window);
+    // Specify background color
+    glClearColor(1.0f, 1.0f, 0.5f,1.0f);
+   
+    while (glfwWindowShouldClose(window)==GL_FALSE)
+    {
+        // Clear window
+        glClear(GL_COLOR_BUFFER_BIT);
+       
+        display();
+        // Swap color buffers
+        glfwSwapBuffers(window);
+        
+        glfwWaitEvents();
+    }
     return EXIT_SUCCESS;
 }
