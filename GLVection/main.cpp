@@ -8,6 +8,8 @@
 
 #include <iostream>
 #include <cstdlib>
+#include <math.h>
+#include <stdio.h>
 
 // glut is now deprecated
 //  thus change it to GLFW
@@ -25,17 +27,8 @@ static void cleanup()
     glfwTerminate();
 }
 
-void display(void){
-  glClear(GL_COLOR_BUFFER_BIT);
-  glColor3d(1.0,0.0,0.0);
-  glBegin(GL_LINES);
-  glVertex2d(-0.8,0.0);
-  glVertex2d(0.8,0.0);
-  glVertex2d(0.0,-0.8);
-  glVertex2d(0.0,0.8);
-  glEnd();
-  glFlush();
-}
+#define PERIODLEN 512
+
 
 int main(int argc, const char * argv[]) {
     // initialize GLFW
@@ -46,8 +39,17 @@ int main(int argc, const char * argv[]) {
         return EXIT_FAILURE;
     }
 
-    // 終了時処理
+    // 終了時処理の登録
     atexit(cleanup);
+    
+    // Sin波の作成
+    GLubyte sinwave[PERIODLEN][3]={0};
+    for (int indx=0; indx < PERIODLEN; indx++)
+    {
+        sinwave[indx][0] = ((sin((double)indx/PERIODLEN*2*M_PI)+1)/2)*255;
+        sinwave[indx][1] = ((sin((double)indx/PERIODLEN*2*M_PI)+1)/2)*255;
+        sinwave[indx][2] = ((sin((double)indx/PERIODLEN*2*M_PI)+1)/2)*255;
+    }
     
     // obtaine monitors for later use.
     int m_count;
@@ -66,21 +68,95 @@ int main(int argc, const char * argv[]) {
         std::cerr << "Can't create GLFW window." << std::endl;
         return EXIT_FAILURE;
     }
-    // Target window which was created in OpenGL
+    
+    // set the window as openGL target
     glfwMakeContextCurrent(window);
-    // Specify background color
-    glClearColor(1.0f, 1.0f, 0.5f,1.0f);
-   
-    while (glfwWindowShouldClose(window)==GL_FALSE)
+    GLuint textureS;
+    glGenTextures(1, &textureS);
+    glBindTexture(GL_TEXTURE_1D, textureS);
+    
+    // data transfere mode
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    
+    // texture assign
+    glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, PERIODLEN, 0, GL_RGB, GL_UNSIGNED_BYTE, sinwave);
+    
+    // テクスチャ拡大縮小オプション
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    // set clear color
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    
+    // configure
+    glEnable(GL_DEPTH_TEST);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(-1, 1, -1, 1, 0, 5);
+    glMatrixMode(GL_MODELVIEW);
+    
+//    glEnable(GL_LIGHTING);
+//    glEnable(GL_LIGHT0);
+    // rendering loop
+    
+    // control variables
+    double vArea = 1.0;         // 垂直方向の描画サイズ
+    double hArea = 1.0;         // 水平方向の描画サイズ
+    int cycles = 5;             // 描画範囲に何周期置くか
+    int stop=-1;
+    double verocity = -0.05;    // 運動右向きが負
+    double texpos = 0.0;    // 描画位置調整用
+    
+    // ESCで終了する。
+    while (glfwWindowShouldClose(window) == GL_FALSE && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
     {
-        // Clear window
-        glClear(GL_COLOR_BUFFER_BIT);
-       
-        display();
-        // Swap color buffers
-        glfwSwapBuffers(window);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        // calc texture pos
+        if(stop<-0) texpos += verocity;
+        // 1枚分以上ずれた時は元の位置に戻す(なくても動くが気持ちの問題)
+        if (texpos >= 1.0) texpos -= 1.0;
+        if (texpos <= -1.0) texpos += 1.0;
+        // テクスチャマッピングはデフォルトでRepeatモード
         
-        glfwWaitEvents();
+        glEnable(GL_TEXTURE_1D);
+        //glNormal3d(0, 0, 1);
+        glBegin(GL_QUADS);
+        glTexCoord2d(texpos, 0); glVertex3d(-hArea, -vArea, -1);
+        glTexCoord2d(texpos, 1); glVertex3d(-hArea, vArea, -1);
+        glTexCoord2d(texpos+cycles, 1); glVertex3d(hArea, vArea, -1);
+        glTexCoord2d(texpos+cycles, 0); glVertex3d(hArea, -vArea, -1);
+        glEnd();
+        glDisable(GL_TEXTURE_1D);
+
+        // mask example
+        //glColor3d(0, 0, 0);
+        //glBegin(GL_QUADS);
+        //glVertex3d(-1, -1, -0.5);
+        //glVertex3d(-1, 1, -0.5);
+        //glVertex3d(-0.3, 1, -0.5);
+        //glVertex3d(-0.3, -1, -0.5);
+        //glEnd();
+        //glColor3d(1, 1, 1);
+        
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+        
+        // Space押されたら停止させる
+        if(glfwGetKey(window,GLFW_KEY_SPACE))stop*=-1;
+        
+        //jで速さを小さく，kで大きく．(右向き正)
+        if(glfwGetKey(window,'J')){
+            verocity+=0.01;
+            printf("verocity=%f\n",verocity);
+        }
+        if(glfwGetKey(window,'K')){
+            verocity-=0.01;
+            printf("verocity=%f\n",verocity);
+        }
     }
+    
+
     return EXIT_SUCCESS;
 }
