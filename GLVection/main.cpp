@@ -104,7 +104,7 @@ int main(int argc, const char * argv[]) {
     double hArea = 1.0;         // 水平方向の描画サイズ
     int cycles = 5;             // 描画範囲に何周期置くか
     int stop=-1;
-    double verocity = -0.05;    // 運動右向きが負
+    double velocity = -0.05;    // 運動右向きが負
     double texpos = 0.0;    // 描画位置調整用
     
     // ESCで終了する。
@@ -114,7 +114,7 @@ int main(int argc, const char * argv[]) {
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         // calc texture pos
-        if(stop<0) texpos += verocity;
+        if(stop<0) texpos += velocity;
         // 1枚分以上ずれた時は元の位置に戻す(なくても動くが気持ちの問題)
         if (texpos >= 1.0) texpos -= 1.0;
         if (texpos <= -1.0) texpos += 1.0;
@@ -148,12 +148,12 @@ int main(int argc, const char * argv[]) {
         
         //jで速さを小さく，kで大きく．(右向き正)
         if(glfwGetKey(window,'J')){
-            verocity+=0.01;
-            printf("verocity=%f\n",verocity);
+            velocity+=0.01;
+            printf("velocity=%f\n",velocity);
         }
         if(glfwGetKey(window,'K')){
-            verocity-=0.01;
-            printf("verocity=%f\n",verocity);
+            velocity-=0.01;
+            printf("velocity=%f\n",velocity);
         }
     }
     
