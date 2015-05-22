@@ -98,11 +98,13 @@ int main(int argc, const char * argv[]) {
     // rendering loop
     
     // control variables
-    double vArea = 1.0;
-    double hArea = 1.0;
-    int cycles = 5;
+    double vArea = 1.0;         // 垂直方向の描画サイズ
+    double hArea = 1.0;         // 水平方向の描画サイズ
+    int cycles = 5;             // 描画範囲に何周期置くか
     double verocity = -0.05;    // 運動右向きが負
-    double texpos = 0.0;
+    double texpos = 0.0;    // 描画位置調整用
+    
+    // ESCで終了する。
     while (glfwWindowShouldClose(window) == GL_FALSE && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -111,8 +113,10 @@ int main(int argc, const char * argv[]) {
         
         // calc texture pos
         texpos += verocity;
+        // 1枚分以上ずれた時は元の位置に戻す(なくても動くが気持ちの問題)
         if (texpos >= 1.0) texpos = 0.0;
         if (texpos <= -1.0) texpos = 0.0;
+        // テクスチャマッピングはデフォルトでRepeatモード
         
         glEnable(GL_TEXTURE_1D);
         //glNormal3d(0, 0, 1);
