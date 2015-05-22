@@ -114,7 +114,7 @@ int main(int argc, const char * argv[]) {
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         // calc texture pos
-        if(stop<-0) texpos += verocity;
+        if(stop<0) texpos += verocity;
         // 1枚分以上ずれた時は元の位置に戻す(なくても動くが気持ちの問題)
         if (texpos >= 1.0) texpos -= 1.0;
         if (texpos <= -1.0) texpos += 1.0;
