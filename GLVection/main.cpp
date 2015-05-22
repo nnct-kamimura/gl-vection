@@ -9,6 +9,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <math.h>
+#include <stdio.h>
 
 // glut is now deprecated
 //  thus change it to GLFW
@@ -27,6 +28,7 @@ static void cleanup()
 }
 
 #define PERIODLEN 512
+
 
 int main(int argc, const char * argv[]) {
     // initialize GLFW
@@ -57,8 +59,8 @@ int main(int argc, const char * argv[]) {
     const GLFWvidmode *mode = glfwGetVideoMode(monitors[0]);
     
     // create window
-    GLFWwindow *const window(glfwCreateWindow(mode->width, mode->height, "GL Vection", monitors[0], NULL));
-    //GLFWwindow *const window(glfwCreateWindow(640, 480, "GL Vection", NULL, NULL));
+    //GLFWwindow *const window(glfwCreateWindow(mode->width, mode->height, "GL Vection", monitors[0], NULL));
+    GLFWwindow *const window(glfwCreateWindow(640, 480, "GL Vection", NULL, NULL));
     
     if (window == NULL)
     {
@@ -69,7 +71,6 @@ int main(int argc, const char * argv[]) {
     
     // set the window as openGL target
     glfwMakeContextCurrent(window);
-
     GLuint textureS;
     glGenTextures(1, &textureS);
     glBindTexture(GL_TEXTURE_1D, textureS);
@@ -93,6 +94,7 @@ int main(int argc, const char * argv[]) {
     glLoadIdentity();
     glOrtho(-1, 1, -1, 1, 0, 5);
     glMatrixMode(GL_MODELVIEW);
+    
 //    glEnable(GL_LIGHTING);
 //    glEnable(GL_LIGHT0);
     // rendering loop
@@ -101,7 +103,8 @@ int main(int argc, const char * argv[]) {
     double vArea = 1.0;         // 垂直方向の描画サイズ
     double hArea = 1.0;         // 水平方向の描画サイズ
     int cycles = 5;             // 描画範囲に何周期置くか
-    double verocity = -0.05;    // 運動右向きが負
+    int stop=-1;
+    double velocity = -0.05;    // 運動右向きが負
     double texpos = 0.0;    // 描画位置調整用
     
     // ESCで終了する。
@@ -110,9 +113,8 @@ int main(int argc, const char * argv[]) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-        
         // calc texture pos
-        texpos += verocity;
+        if(stop<0) texpos += velocity;
         // 1枚分以上ずれた時は元の位置に戻す(なくても動くが気持ちの問題)
         if (texpos >= 1.0) texpos -= 1.0;
         if (texpos <= -1.0) texpos += 1.0;
@@ -129,18 +131,32 @@ int main(int argc, const char * argv[]) {
         glDisable(GL_TEXTURE_1D);
 
         // mask example
-//        glColor3d(0, 0, 0);
-//        glBegin(GL_QUADS);
-//        glVertex3d(-1, -1, -0.5);
-//        glVertex3d(-1, 1, -0.5);
-//        glVertex3d(-0.3, 1, -0.5);
-//        glVertex3d(-0.3, -1, -0.5);
-//        glEnd();
-//        glColor3d(1, 1, 1);
+        //glColor3d(0, 0, 0);
+        //glBegin(GL_QUADS);
+        //glVertex3d(-1, -1, -0.5);
+        //glVertex3d(-1, 1, -0.5);
+        //glVertex3d(-0.3, 1, -0.5);
+        //glVertex3d(-0.3, -1, -0.5);
+        //glEnd();
+        //glColor3d(1, 1, 1);
         
         glfwSwapBuffers(window);
         glfwPollEvents();
+        
+        // Space押されたら停止させる
+        if(glfwGetKey(window,GLFW_KEY_SPACE))stop*=-1;
+        
+        //jで速さを小さく，kで大きく．(右向き正)
+        if(glfwGetKey(window,'J')){
+            velocity+=0.01;
+            printf("velocity=%f\n",velocity);
+        }
+        if(glfwGetKey(window,'K')){
+            velocity-=0.01;
+            printf("velocity=%f\n",velocity);
+        }
     }
     
+
     return EXIT_SUCCESS;
 }
