@@ -123,6 +123,16 @@ int main(int argc, const char * argv[]) {
         glTexCoord2d(texpos+cycles, 0); glVertex3d(hArea, -vArea, -1);
         glEnd();
         glDisable(GL_TEXTURE_1D);
+
+        // mask example
+//        glColor3d(0, 0, 0);
+//        glBegin(GL_QUADS);
+//        glVertex3d(-1, -1, -0.5);
+//        glVertex3d(-1, 1, -0.5);
+//        glVertex3d(-0.3, 1, -0.5);
+//        glVertex3d(-0.3, -1, -0.5);
+//        glEnd();
+//        glColor3d(1, 1, 1);
         
         glfwSwapBuffers(window);
         glfwPollEvents();
