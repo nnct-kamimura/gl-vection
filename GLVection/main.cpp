@@ -41,7 +41,7 @@ int main(int argc, const char * argv[]) {
     atexit(cleanup);
     
     // Sin波の作成
-    GLubyte sinwave[PERIODLEN][3];
+    GLubyte sinwave[PERIODLEN][3] = {0};
     for (int indx=0; indx < PERIODLEN; indx++)
     {
         sinwave[indx][0] = ((sin((double)indx/PERIODLEN*2*M_PI)+1)/2)*255;
@@ -114,8 +114,8 @@ int main(int argc, const char * argv[]) {
         // calc texture pos
         texpos += verocity;
         // 1枚分以上ずれた時は元の位置に戻す(なくても動くが気持ちの問題)
-        if (texpos >= 1.0) texpos = 0.0;
-        if (texpos <= -1.0) texpos = 0.0;
+        if (texpos >= 1.0) texpos -= 1.0;
+        if (texpos <= -1.0) texpos += 1.0;
         // テクスチャマッピングはデフォルトでRepeatモード
         
         glEnable(GL_TEXTURE_1D);
