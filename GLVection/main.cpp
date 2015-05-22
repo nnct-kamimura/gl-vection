@@ -29,6 +29,49 @@ static void cleanup()
 
 #define PERIODLEN 512
 
+// control variables  (global)
+double vArea = 1.0;         // 垂直方向の描画サイズ
+double hArea = 1.0;         // 水平方向の描画サイズ
+int cycles = 5;             // 描画範囲に何周期置くか
+int stop=-1;
+double velocity = -0.05;    // 運動右向きが負
+double texpos = 0.0;        // 描画位置調整用
+GLboolean exitProg = GL_FALSE;
+
+
+// Keyboard CallBack
+void keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (action == GLFW_PRESS || action == GLFW_REPEAT)
+    {
+        switch (key)
+        {
+            // Space押されたら停止させる
+            case GLFW_KEY_SPACE:
+                stop *= -1;
+                break;
+                
+            // jで速さを小さく，kで大きく．(右向き正)
+            case GLFW_KEY_J:
+                velocity+=0.01;
+                fprintf(stderr,"velocity=%f\n",velocity);
+                break;
+                
+            case GLFW_KEY_K:
+                velocity-=0.01;
+                fprintf(stderr,"velocity=%f\n",velocity);
+                break;
+            
+            // ESCで終了
+            case GLFW_KEY_ESCAPE:
+                exitProg = GL_TRUE;
+                break;
+
+            default:
+                break;
+        }
+    }
+}
 
 int main(int argc, const char * argv[]) {
     // initialize GLFW
@@ -71,6 +114,10 @@ int main(int argc, const char * argv[]) {
     
     // set the window as openGL target
     glfwMakeContextCurrent(window);
+    
+    // set keyboard callback function
+    glfwSetKeyCallback(window, keyCallBack);
+    
     GLuint textureS;
     glGenTextures(1, &textureS);
     glBindTexture(GL_TEXTURE_1D, textureS);
@@ -97,17 +144,8 @@ int main(int argc, const char * argv[]) {
     
 //    glEnable(GL_LIGHTING);
 //    glEnable(GL_LIGHT0);
+
     // rendering loop
-    
-    // control variables
-    double vArea = 1.0;         // 垂直方向の描画サイズ
-    double hArea = 1.0;         // 水平方向の描画サイズ
-    int cycles = 5;             // 描画範囲に何周期置くか
-    int stop=-1;
-    double velocity = -0.05;    // 運動右向きが負
-    double texpos = 0.0;    // 描画位置調整用
-    
-    // ESCで終了する。
     while (glfwWindowShouldClose(window) == GL_FALSE && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -142,19 +180,6 @@ int main(int argc, const char * argv[]) {
         
         glfwSwapBuffers(window);
         glfwPollEvents();
-        
-        // Space押されたら停止させる
-        if(glfwGetKey(window,GLFW_KEY_SPACE))stop*=-1;
-        
-        //jで速さを小さく，kで大きく．(右向き正)
-        if(glfwGetKey(window,'J')){
-            velocity+=0.01;
-            printf("velocity=%f\n",velocity);
-        }
-        if(glfwGetKey(window,'K')){
-            velocity-=0.01;
-            printf("velocity=%f\n",velocity);
-        }
     }
     
 
