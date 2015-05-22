@@ -51,7 +51,7 @@ void keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods
                 stop *= -1;
                 break;
                 
-            // jで速さを小さく，kで大きく．(右向き正)
+            // jで左向きに加速，kで右向きに加速
             case GLFW_KEY_J:
                 velocity+=0.01;
                 fprintf(stderr,"velocity=%f\n",velocity);
