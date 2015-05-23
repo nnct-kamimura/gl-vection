@@ -51,7 +51,7 @@ void keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods
                 stop *= -1;
                 break;
                 
-            // jで左向きに加速，kで右向きに加速
+            // jで左向きに加速，kで右向きに加速，fで逆向きに進む
             case GLFW_KEY_J:
                 velocity+=0.01;
                 fprintf(stderr,"velocity=%f\n",velocity);
@@ -62,6 +62,20 @@ void keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods
                 fprintf(stderr,"velocity=%f\n",velocity);
                 break;
             
+            case GLFW_KEY_F:
+                velocity*=-1;
+                fprintf(stderr,"velocity=%f\n",velocity);
+                break;
+                
+            // hで周期を短く，lで長くする
+            case GLFW_KEY_H:
+                cycles--;
+                break;
+                
+            case GLFW_KEY_L:
+                cycles++;
+                break;
+                
             // ESCで終了
             case GLFW_KEY_ESCAPE:
                 exitProg = GL_TRUE;
