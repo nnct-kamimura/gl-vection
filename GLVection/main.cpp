@@ -52,6 +52,7 @@ void keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods
                 break;
                 
             // jで左向きに加速，kで右向きに加速，fで逆向きに進む
+                // 速度は0以上1未満なので絶対値と方向で管理してもよいかも 5/29 kamimura
             case GLFW_KEY_J:
                 velocity+=0.01;
                 fprintf(stderr,"velocity=%f\n",velocity);
@@ -74,6 +75,11 @@ void keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods
                 
             case GLFW_KEY_L:
                 cycles++;
+                break;
+            
+            // toggle Fullscreen
+            case GLFW_KEY_S:
+                // コンテキストシェアしつつ再設定いるかもなので保留
                 break;
                 
             // ESCで終了
@@ -112,19 +118,30 @@ int main(int argc, const char * argv[]) {
     int m_count;
     GLFWmonitor **monitors = glfwGetMonitors(&m_count);
     
-    // とりあえず何も考えずにプライマリモニタを利用
-    const GLFWvidmode *mode = glfwGetVideoMode(monitors[0]);
+    // test 2015/05/29 get monitor physical size to calculate resolution as visual angle.
+    int monHeight, monWidth;
+    glfwGetMonitorPhysicalSize(monitors[0], &monWidth, &monHeight);
     
-    // create window
+//    // full screen mode
+//    // とりあえず何も考えずにプライマリモニタを利用
+//    const GLFWvidmode *mode = glfwGetVideoMode(monitors[0]);
     //GLFWwindow *const window(glfwCreateWindow(mode->width, mode->height, "GL Vection", monitors[0], NULL));
+
+    // create window
     GLFWwindow *const window(glfwCreateWindow(640, 480, "GL Vection", NULL, NULL));
-    
+
     if (window == NULL)
     {
         // fail in window creation
         std::cerr << "Can't create GLFW window." << std::endl;
         return EXIT_FAILURE;
     }
+
+    // gamma ramp
+    // object's gamma(input) -> colorsync -> display's gamma(output)
+    //  gamma ramp seems adjusting colorsync property.
+    // const GLFWgammaramp *gammaO = glfwGetGammaRamp(monitors[0]);
+    glfwSetGamma(monitors[0], 1/2.2);    // inverse gamma
     
     // set the window as openGL target
     glfwMakeContextCurrent(window);
