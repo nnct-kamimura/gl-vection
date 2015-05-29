@@ -132,7 +132,33 @@ int main(int argc, const char * argv[]) {
     // gamma ramp
     // object's gamma(input) -> colorsync -> display's gamma(output)
     //  gamma ramp seems adjusting colorsync property.
-    // const GLFWgammaramp *gammaO = glfwGetGammaRamp(monitors[0]);
+    
+    // ガンマを取得して逆関数をかけようと思ったが，取得されるガンマはほぼ線形
+    // 　カラープロファイルを読んでいるわけではなさそう
+    {
+//        const GLFWgammaramp *gammaO = glfwGetGammaRamp(monitors[0]);
+//        GLFWgammaramp gammaI;
+//        gammaI.size = gammaO->size;
+//        unsigned short red[gammaO->size], green[gammaO->size], blue[gammaO->size];
+//        unsigned int gStep = 65535 / gammaI.size, gV, temp[1024];
+//        red[0] = 0;
+//        green[0] = 0;
+//        blue[0] = 0;
+//        for (int i=1; i < gammaI.size; i++)
+//        {
+//            temp[i] = gammaO->red[i];
+//            gV = (i * gStep) * (i * gStep);
+//            red[i] = gV / gammaO->red[i];
+//            green[i] = gV / gammaO->green[i];
+//            blue[i] = gV / gammaO->blue[i];
+//        }
+//        gammaI.red = red;
+//        gammaI.green = green;
+//        gammaI.blue = blue;
+//        
+//        glfwSetGammaRamp(monitors[0], &gammaI);
+    }   // スコープ作るための括弧
+
     glfwSetGamma(monitors[0], 1/2.2);    // inverse gamma
     
     // set the window as openGL target
@@ -227,6 +253,8 @@ int main(int argc, const char * argv[]) {
                 
                 windowed = GL_TRUE;
             }
+            // keyboard callback
+            glfwSetKeyCallback(window, keyCallBack);
             
             // texture assign
             glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, PERIODLEN, 0, GL_RGB, GL_UNSIGNED_BYTE, sinwave);
