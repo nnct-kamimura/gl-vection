@@ -30,15 +30,16 @@ static void cleanup()
 #define PERIODLEN 512
 
 // control variables  (global)
-double vArea = 1.0;         // 垂直方向の描画サイズ
-double hArea = 1.0;         // 水平方向の描画サイズ
+double vArea = 2.0;         // 垂直方向の描画サイズ
+double hArea = 2.0;         // 水平方向の描画サイズ
 int cycles = 5;             // 描画範囲に何周期置くか
 int stop=-1;
-double velocity = -0.05;    // 運動右向きが負
+double velocity = 0.05;    // 初期速度
 double texpos = 0.0;        // 描画位置調整用
 //GLboolean exitProg = GL_FALSE;
 GLboolean windowed = GL_FALSE;
 GLFWwindow *window;
+GLdouble rotAngle = 180.0;
 
 // Keyboard CallBack
 void keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -53,29 +54,64 @@ void keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods
                 break;
                 
             // jで左向きに加速，kで右向きに加速，fで逆向きに進む
-                // 速度は0以上1未満なので絶対値と方向で管理してもよいかも 5/29 kamimura
             case GLFW_KEY_J:
                 velocity+=0.01;
+                if (velocity > 1.0)
+                {
+                    velocity = 1.0;
+                }
                 fprintf(stderr,"velocity=%f\n",velocity);
                 break;
                 
             case GLFW_KEY_K:
                 velocity-=0.01;
+                if (velocity < 0.0)
+                {
+                    velocity = 0.0;
+                }
                 fprintf(stderr,"velocity=%f\n",velocity);
                 break;
             
             case GLFW_KEY_F:
-                velocity*=-1;
-                fprintf(stderr,"velocity=%f\n",velocity);
+                rotAngle = rotAngle + 180.0;
+                if (rotAngle > 360)
+                {
+                    rotAngle -= 360;
+                }
+                fprintf(stderr,"angle=%f\n",rotAngle);
+                break;
+                
+            case GLFW_KEY_R:
+                rotAngle += 5.0;
+                if (rotAngle > 360.0)
+                {
+                    rotAngle -= 360.0;
+                }
+                fprintf(stderr,"angle=%f\n",rotAngle);
+                break;
+
+            case GLFW_KEY_V:
+                rotAngle -= 5.0;
+                if (rotAngle < 0.0)
+                {
+                    rotAngle += 360.0;
+                }
+                fprintf(stderr,"angle=%f\n",rotAngle);
                 break;
                 
             // hで周期を短く，lで長くする
             case GLFW_KEY_H:
                 cycles--;
+                if (cycles < 0)
+                {
+                    cycles = 0;
+                }
+                fprintf(stderr,"cycles=%d\n",cycles);
                 break;
                 
             case GLFW_KEY_L:
                 cycles++;
+                fprintf(stderr,"cycles=%d\n",cycles);
                 break;
                 
 //            // ESCで終了
@@ -207,13 +243,14 @@ int main(int argc, const char * argv[]) {
         if (texpos <= -1.0) texpos += 1.0;
         // テクスチャマッピングはデフォルトでRepeatモード
         
+        glRotated(rotAngle, 0, 0, 1.0);
         glEnable(GL_TEXTURE_1D);
         //glNormal3d(0, 0, 1);
         glBegin(GL_QUADS);
-        glTexCoord2d(texpos, 0); glVertex3d(-hArea, -vArea, -1);
-        glTexCoord2d(texpos, 1); glVertex3d(-hArea, vArea, -1);
-        glTexCoord2d(texpos+cycles, 1); glVertex3d(hArea, vArea, -1);
-        glTexCoord2d(texpos+cycles, 0); glVertex3d(hArea, -vArea, -1);
+        glTexCoord2d(texpos*hArea, 0); glVertex3d(-hArea, -vArea, -1);
+        glTexCoord2d(texpos*hArea, 1); glVertex3d(-hArea, vArea, -1);
+        glTexCoord2d((texpos+cycles)*hArea, 1); glVertex3d(hArea, vArea, -1);
+        glTexCoord2d((texpos+cycles)*hArea, 0); glVertex3d(hArea, -vArea, -1);
         glEnd();
         glDisable(GL_TEXTURE_1D);
 
