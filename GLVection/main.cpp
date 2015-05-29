@@ -284,7 +284,7 @@ int main(int argc, const char * argv[]) {
             }
             else
             {
-                GLFWwindow *tmpWind = glfwCreateWindow(640, 480, "GL Vection", NULL, NULL);
+                GLFWwindow *tmpWind = glfwCreateWindow(640, 480, "GL Vection", NULL, window);
                 glfwDestroyWindow(window);
                 window = tmpWind;
                 glfwMakeContextCurrent(window);
