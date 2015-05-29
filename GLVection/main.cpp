@@ -270,6 +270,7 @@ int main(int argc, const char * argv[]) {
         // toggle Fullscreen
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         {
+             // window廃棄を伴うので，同期処理する(Kyeboardコールバック(非同期)ではやらない)
             if (windowed)
             {
                 // とりあえず何も考えずにプライマリモニタを利用
