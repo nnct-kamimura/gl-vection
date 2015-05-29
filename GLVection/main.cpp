@@ -36,8 +36,9 @@ int cycles = 5;             // 描画範囲に何周期置くか
 int stop=-1;
 double velocity = -0.05;    // 運動右向きが負
 double texpos = 0.0;        // 描画位置調整用
-GLboolean exitProg = GL_FALSE;
-
+//GLboolean exitProg = GL_FALSE;
+GLboolean windowed = GL_FALSE;
+GLFWwindow *window;
 
 // Keyboard CallBack
 void keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -76,16 +77,11 @@ void keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods
             case GLFW_KEY_L:
                 cycles++;
                 break;
-            
-            // toggle Fullscreen
-            case GLFW_KEY_S:
-                // コンテキストシェアしつつ再設定いるかもなので保留
-                break;
                 
-            // ESCで終了
-            case GLFW_KEY_ESCAPE:
-                exitProg = GL_TRUE;
-                break;
+//            // ESCで終了
+//            case GLFW_KEY_ESCAPE:
+//                exitProg = GL_TRUE;
+//                break;
 
             default:
                 break;
@@ -122,13 +118,9 @@ int main(int argc, const char * argv[]) {
     int monHeight, monWidth;
     glfwGetMonitorPhysicalSize(monitors[0], &monWidth, &monHeight);
     
-//    // full screen mode
-//    // とりあえず何も考えずにプライマリモニタを利用
-//    const GLFWvidmode *mode = glfwGetVideoMode(monitors[0]);
-    //GLFWwindow *const window(glfwCreateWindow(mode->width, mode->height, "GL Vection", monitors[0], NULL));
-
     // create window
-    GLFWwindow *const window(glfwCreateWindow(640, 480, "GL Vection", NULL, NULL));
+    window = glfwCreateWindow(640, 480, "GL Vection", NULL, NULL);
+    windowed = GL_TRUE;
 
     if (window == NULL)
     {
@@ -211,8 +203,39 @@ int main(int argc, const char * argv[]) {
         
         glfwSwapBuffers(window);
         glfwPollEvents();
+        
+        // toggle Fullscreen
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        {
+            if (windowed)
+            {
+                // とりあえず何も考えずにプライマリモニタを利用
+                const GLFWvidmode *mode = glfwGetVideoMode(monitors[0]);
+                GLFWwindow *tmpWind = glfwCreateWindow(mode->width, mode->height, "GL Vection", monitors[0], window);
+                glfwDestroyWindow(window);
+                window = tmpWind;
+                glfwMakeContextCurrent(window);
+                
+                windowed = GL_FALSE;
+            }
+            else
+            {
+                GLFWwindow *tmpWind = glfwCreateWindow(640, 480, "GL Vection", NULL, NULL);
+                glfwDestroyWindow(window);
+                window = tmpWind;
+                glfwMakeContextCurrent(window);
+                
+                windowed = GL_TRUE;
+            }
+            
+            // texture assign
+            glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, PERIODLEN, 0, GL_RGB, GL_UNSIGNED_BYTE, sinwave);
+            
+            // テクスチャ拡大縮小オプション
+            glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+       }
     }
-    
 
     return EXIT_SUCCESS;
 }
